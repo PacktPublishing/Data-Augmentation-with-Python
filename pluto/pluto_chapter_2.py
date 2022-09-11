@@ -11,11 +11,11 @@ import datetime
 import sys
 import psutil
 # create class/object 
-class PackTDataAug(object):
+class PacktDataAug(object):
   #
   # initialize the object
-  def __init__(self, name="Wallaby", is_verbose=True,*args, **kwargs):
-    super(PackTDataAug, self).__init__(*args, **kwargs)
+  def __init__(self, name="Pluto", is_verbose=True,*args, **kwargs):
+    super(PacktDataAug, self).__init__(*args, **kwargs)
     self.author = "Duc Haba"
     self.name = name
     if (is_verbose):
@@ -53,8 +53,10 @@ def add_method(cls):
     return func 
   return decorator
 #
-pluto = PackTDataAug("Pluto")
-@add_method(PackTDataAug)
+
+pluto = PacktDataAug("Pluto")
+
+@add_method(PacktDataAug)
 def say_sys_info(self):
   self._ph()
   now = datetime.datetime.now()
