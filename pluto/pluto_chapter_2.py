@@ -83,10 +83,22 @@ def say_sys_info(self):
   self._ph()
   return
 
-# easy method to download kaggle data files
-!pip install opendatasets --upgrade
-import opendatasets
-print("\nrequired version 0.1.22 or higher: ", opendatasets.__version__)
+# -------------------- : --------------------
+# READ ME
+# Chapter 2 begin:
+# Install the following libraries and import it on the Notebook
+#
+# !pip install opendatasets --upgrade
+# import opendatasets
+# print("\nrequired version 0.1.22 or higher: ", opendatasets.__version__)
+# 
+# !pip install pyspellchecker 
+# import spellchecker
+# print("\nRequired version 0.7+", spellchecker.__version__)
+#
+# pluto.remember_kaggle_access_keys("your_kaggle_name", "your_kaggle_key")
+# pluto._write_kaggle_credit()
+# -------------------- : --------------------
 
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
@@ -205,6 +217,13 @@ def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]):
   return
 
 @add_method(PacktDataAug)
+def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
+  df = df_orig[cols] 
+  with pandas.option_context("display.max_colwidth", None):
+    display(df.sample(disp_max))
+  return
+
+@add_method(PacktDataAug)
 def count_word(self, df, col_dest="description"):
   df['wordc'] = df[col_dest].apply(lambda x: len(x.split()))
   return
@@ -233,13 +252,7 @@ def draw_word_count(self,df, wc='wordc'):
   canvas.show()
   return
 
-!pip install pyspellchecker 
-import spellchecker
 import re
-#spell_check = spellchecker.SpellChecker()
-pluto._ph()
-pluto._pp("Required version 0.7+", spellchecker.__version__)
-
 @add_method(PacktDataAug)
 def _strip_punc(self,s):
   p = re.sub(r'[^\w\s]','',s)
