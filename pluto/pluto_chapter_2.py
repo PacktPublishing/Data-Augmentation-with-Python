@@ -86,7 +86,10 @@ def say_sys_info(self):
 # -------------------- : --------------------
 # READ ME
 # Chapter 2 begin:
-# Install the following libraries and import it on the Notebook
+# Install the following libraries, and import it on the Notebook.
+# Follow by initialize Kaggle username, key and fetch methods.
+# STOP: Update your Kaggle access username or key first.
+# -------------------- : --------------------
 #
 # !pip install opendatasets --upgrade
 # import opendatasets
@@ -96,9 +99,25 @@ def say_sys_info(self):
 # import spellchecker
 # print("\nRequired version 0.7+", spellchecker.__version__)
 #
+# # STOP: Update your Kaggle access username or key first.
 # pluto.remember_kaggle_access_keys("your_kaggle_name", "your_kaggle_key")
 # pluto._write_kaggle_credit()
-# -------------------- : --------------------
+# import kaggle
+#
+# @add_method(PacktDataAug)
+# def fetch_kaggle_comp_data(self,cname):
+#   #self._write_kaggle_credit()  # need to run only once.
+#   path = pathlib.Path(cname)
+#   kaggle.api.competition_download_cli(str(path))
+#   zipfile.ZipFile(f'{path}.zip').extractall(path)
+#   return
+# 
+# @add_method(PacktDataAug)
+# def fetch_kaggle_dataset(self,url,dest="kaggle"):
+#   #self._write_kaggle_credit()    # need to run only once.
+#   opendatasets.download(url,data_dir=dest)
+#   return
+# # -------------------- : --------------------
 
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
@@ -122,7 +141,7 @@ def _write_kaggle_credit(self):
 #
 @add_method(PacktDataAug)
 def fetch_kaggle_comp_data(self,cname):
-  self._write_kaggle_credit()
+  #self._write_kaggle_credit()  # need to run only once.
   path = pathlib.Path(cname)
   kaggle.api.competition_download_cli(str(path))
   zipfile.ZipFile(f'{path}.zip').extractall(path)
@@ -131,11 +150,10 @@ def fetch_kaggle_comp_data(self,cname):
 #
 @add_method(PacktDataAug)
 def fetch_kaggle_dataset(self,url,dest="kaggle"):
-  self._write_kaggle_credit()
+  #self._write_kaggle_credit()    # need to run only once.
   opendatasets.download(url,data_dir=dest)
   return
 
-import kaggle
 import zipfile
 import os
 
@@ -208,13 +226,6 @@ def build_shoe_fname(self, start_path):
   # clean it up
   df = df.reset_index(drop=True)
   return df
-
-@add_method(PacktDataAug)
-def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
-  df = df_orig[cols] 
-  with pandas.option_context("display.max_colwidth", None):
-    display(df.sample(disp_max))
-  return
 
 @add_method(PacktDataAug)
 def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
