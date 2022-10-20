@@ -211,8 +211,6 @@ def draw_batch(self,df_filenames, disp_max=10,is_shuffle=False, figsize=(16,8)):
     print("**Warning: the length should be more then ", disp_max, ". The given length: ", len(_fns))
   return clean_fns
 
-import os
-#
 @add_method(PacktDataAug)
 def build_shoe_fname(self, start_path):
   df = pandas.DataFrame()
@@ -226,6 +224,11 @@ def build_shoe_fname(self, start_path):
   # clean it up
   df = df.reset_index(drop=True)
   return df
+#
+# create the same with a generic function name
+@add_method(PacktDataAug)
+def make_dir_dataframe(self, start_path):
+  return self.build_shoe_fname(start_path)
 
 @add_method(PacktDataAug)
 def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
