@@ -17,12 +17,14 @@ class PacktDataAug(object):
   def __init__(self, name="Pluto", is_verbose=True,*args, **kwargs):
     super(PacktDataAug, self).__init__(*args, **kwargs)
     self.author = "Duc Haba"
+    self.version = 1.0
     self.name = name
     if (is_verbose):
       self._ph()
       self._pp("Hello from class", str(self.__class__) + " Class: " + str(self.__class__.__name__))
       self._pp("Code name", self.name)
       self._pp("Author is", self.author)
+      self._pp("Version (Chapter) is", self.version)
       self._ph()
     #
     return
