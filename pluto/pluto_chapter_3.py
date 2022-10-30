@@ -17,6 +17,7 @@ class PacktDataAug(object):
   def __init__(self, name="Pluto", is_verbose=True,*args, **kwargs):
     super(PacktDataAug, self).__init__(*args, **kwargs)
     self.author = "Duc Haba"
+    self.version = 1.0
     self.name = name
     if (is_verbose):
       self._ph()
@@ -62,11 +63,12 @@ def say_sys_info(self):
   now = datetime.datetime.now()
   self._pp("System time", now.strftime("%Y/%m/%d %H:%M"))
   self._pp("Platform", sys.platform)
-  self._pp("Python version (3.7+)", sys.version)
-  self._pp("PyTorch version (1.11+)", torch.__version__)
-  self._pp("Pandas version (1.3.5+)", pandas.__version__)
-  self._pp("PIL version (9.0.0+)", PIL.__version__)
-  self._pp("Matplotlib version (3.2.2+)", matplotlib.__version__)
+  self._pp("Pluto Version (Chapter)", self.version)
+  self._pp("Python (3.7.10)", 'actual: ' + ''.join(str(sys.version).splitlines()))
+  self._pp("PyTorch (1.11.0)", 'actual: ' + str(torch.__version__))
+  self._pp("Pandas (1.3.5)", 'actual: ' + str(pandas.__version__))
+  self._pp("PIL (9.0.0)", 'actual: ' + str(PIL.__version__))
+  self._pp("Matplotlib (3.2.2)", 'actual: ' + str(matplotlib.__version__))
   #
   try:
     val = psutil.cpu_count()
@@ -83,42 +85,7 @@ def say_sys_info(self):
   self._ph()
   return
 
-# -------------------- : --------------------
-# READ ME
-# Chapter 2 begin:
-# Install the following libraries, and import it on the Notebook.
-# Follow by initialize Kaggle username, key and fetch methods.
-# STOP: Update your Kaggle access username or key first.
-# -------------------- : --------------------
-#
-# !pip install opendatasets --upgrade
-# import opendatasets
-# print("\nrequired version 0.1.22 or higher: ", opendatasets.__version__)
-# 
-# !pip install pyspellchecker 
-# import spellchecker
-# print("\nRequired version 0.7+", spellchecker.__version__)
-#
-# # STOP: Update your Kaggle access username or key first.
-# pluto.remember_kaggle_access_keys("your_kaggle_name", "your_kaggle_key")
-# pluto._write_kaggle_credit()
-# import kaggle
-#
-# @add_method(PacktDataAug)
-# def fetch_kaggle_comp_data(self,cname):
-#   #self._write_kaggle_credit()  # need to run only once.
-#   path = pathlib.Path(cname)
-#   kaggle.api.competition_download_cli(str(path))
-#   zipfile.ZipFile(f'{path}.zip').extractall(path)
-#   return
-# 
-# @add_method(PacktDataAug)
-# def fetch_kaggle_dataset(self,url,dest="kaggle"):
-#   #self._write_kaggle_credit()    # need to run only once.
-#   opendatasets.download(url,data_dir=dest)
-#   return
-# # -------------------- : --------------------
-
+pluto.version = 2.0
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
   self.kaggle_username = username
@@ -157,9 +124,12 @@ def fetch_kaggle_dataset(self,url,dest="kaggle"):
 import zipfile
 import os
 
+import zipfile
+import os
+
 @add_method(PacktDataAug)
 def fetch_df(self, csv):
-  df = pandas.read_csv(csv)
+  df = pandas.read_csv(csv, encoding='latin-1')
   return df
 
 @add_method(PacktDataAug)
@@ -282,6 +252,7 @@ def check_spelling(self,df, col_dest='description'):
 # STOP: if failed the import below, you need to run:
 # !pip install -Uqq fastai
 #
+pluto.version = 3.0
 from fastcore.all import *
 import fastai
 import fastai.vision
@@ -442,13 +413,6 @@ def draw_image_noise(self,df,var_limit=(10.0, 50.0),bsize=5):
   return
 
 @add_method(PacktDataAug)
-def draw_image_snow(self,df,snow_point_lower=0.1,snow_point_upper=0.3,bsize=2,brightness_coeff=2.5):
-  aug_album = albumentations.RandomSnow(snow_point_lower=snow_point_lower,
-    snow_point_upper = snow_point_upper, always_apply=True, p=1.0,brightness_coeff=brightness_coeff)
-  self._draw_image_album(df,aug_album,bsize)
-  return
-
-@add_method(PacktDataAug)
 def draw_image_sunflare(self,df,flare_roi=(0, 0, 1, 0.5),src_radius=400,bsize=2):
   aug_album = albumentations.RandomSunFlare(flare_roi=flare_roi,
     src_radius=src_radius, always_apply=True, p=1.0)
@@ -512,17 +476,6 @@ class AlbumentationsTransform(DisplayedTransform):
   def encodes(self, img: fastai.vision.core.PILImage):
     aug_img = self.train_aug(image=numpy.array(img))['image']
     return fastai.vision.core.PILImage.create(aug_img)
-#
-# def get_train_aug(): return albumentations.Compose([
-#   #albumentations.HueSaturationValue(
-#       #hue_shift_limit=0.2, 
-#       #sat_shift_limit=0.2, 
-#       #val_shift_limit=0.2, 
-#       #p=0.5
-#   #),
-#   albumentations.ColorJitter(brightness=0.2,
-#     contrast=0.0, saturation=0.0,hue=0.0,p=0.5)
-# ])
 
 @add_method(PacktDataAug)
 def _fetch_album_covid19(self):
@@ -583,6 +536,28 @@ def draw_augment_fungi(self,df,bsize=15):
     fastai.vision.augment.Warp(magnitude=0.3, pad_mode='border',p=0.5),
     fastai.vision.augment.RandomErasing(p=0.5,max_count=2),
     AlbumentationsTransform(self._fetch_album_fungi())
+    ]
+  itfms = fastai.vision.augment.Resize(480)
+  dsl_org = self._make_data_loader(df, aug,itfms)
+  dsl_org.show_batch(max_n=bsize)
+  return dsl_org
+
+@add_method(PacktDataAug)
+def _fetch_album_sea_animal(self):
+  return albumentations.Compose([
+  albumentations.ColorJitter(brightness=0.4, contrast=0.4, saturation=2.0,hue=1.5, p=0.5),
+  albumentations.FancyPCA(alpha=0.5, p=0.5),
+  albumentations.GaussNoise(var_limit=(200.0, 400.0), p=0.5)
+  ])
+#
+@add_method(PacktDataAug)
+def draw_augment_sea_animal(self,df,bsize=15):
+  aug = [
+    fastai.vision.augment.Dihedral(p=0.5,pad_mode='reflection'),
+    fastai.vision.augment.Rotate(180.0,p=0.5,pad_mode='reflection'),
+    fastai.vision.augment.Warp(magnitude=0.3, pad_mode='reflection',p=0.5),
+    fastai.vision.augment.RandomErasing(p=0.5,max_count=2),
+    AlbumentationsTransform(self._fetch_album_sea_animal())
     ]
   itfms = fastai.vision.augment.Resize(480)
   dsl_org = self._make_data_loader(df, aug,itfms)
