@@ -24,7 +24,6 @@ class PacktDataAug(object):
       self._pp("Hello from class", str(self.__class__) + " Class: " + str(self.__class__.__name__))
       self._pp("Code name", self.name)
       self._pp("Author is", self.author)
-      self._pp("Version (Chapter) is", self.version)
       self._ph()
     #
     return
@@ -64,11 +63,12 @@ def say_sys_info(self):
   now = datetime.datetime.now()
   self._pp("System time", now.strftime("%Y/%m/%d %H:%M"))
   self._pp("Platform", sys.platform)
-  self._pp("Python version (3.7+)", sys.version)
-  self._pp("PyTorch version (1.11+)", torch.__version__)
-  self._pp("Pandas version (1.3.5+)", pandas.__version__)
-  self._pp("PIL version (9.0.0+)", PIL.__version__)
-  self._pp("Matplotlib version (3.2.2+)", matplotlib.__version__)
+  self._pp("Pluto Version (Chapter)", self.version)
+  self._pp("Python (3.7.10)", 'actual: ' + ''.join(str(sys.version).splitlines()))
+  self._pp("PyTorch (1.11.0)", 'actual: ' + str(torch.__version__))
+  self._pp("Pandas (1.3.5)", 'actual: ' + str(pandas.__version__))
+  self._pp("PIL (9.0.0)", 'actual: ' + str(PIL.__version__))
+  self._pp("Matplotlib (3.2.2)", 'actual: ' + str(matplotlib.__version__))
   #
   try:
     val = psutil.cpu_count()
