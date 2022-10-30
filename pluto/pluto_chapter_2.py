@@ -17,6 +17,7 @@ class PacktDataAug(object):
   def __init__(self, name="Pluto", is_verbose=True,*args, **kwargs):
     super(PacktDataAug, self).__init__(*args, **kwargs)
     self.author = "Duc Haba"
+    self.version = 1.0
     self.name = name
     if (is_verbose):
       self._ph()
@@ -62,11 +63,12 @@ def say_sys_info(self):
   now = datetime.datetime.now()
   self._pp("System time", now.strftime("%Y/%m/%d %H:%M"))
   self._pp("Platform", sys.platform)
-  self._pp("Python version (3.7+)", sys.version)
-  self._pp("PyTorch version (1.11+)", torch.__version__)
-  self._pp("Pandas version (1.3.5+)", pandas.__version__)
-  self._pp("PIL version (9.0.0+)", PIL.__version__)
-  self._pp("Matplotlib version (3.2.2+)", matplotlib.__version__)
+  self._pp("Pluto Version (Chapter)", self.version)
+  self._pp("Python (3.7.10)", 'actual: ' + ''.join(str(sys.version).splitlines()))
+  self._pp("PyTorch (1.11.0)", 'actual: ' + str(torch.__version__))
+  self._pp("Pandas (1.3.5)", 'actual: ' + str(pandas.__version__))
+  self._pp("PIL (9.0.0)", 'actual: ' + str(PIL.__version__))
+  self._pp("Matplotlib (3.2.2)", 'actual: ' + str(matplotlib.__version__))
   #
   try:
     val = psutil.cpu_count()
@@ -83,42 +85,7 @@ def say_sys_info(self):
   self._ph()
   return
 
-# -------------------- : --------------------
-# READ ME
-# Chapter 2 begin:
-# Install the following libraries, and import it on the Notebook.
-# Follow by initialize Kaggle username, key and fetch methods.
-# STOP: Update your Kaggle access username or key first.
-# -------------------- : --------------------
-#
-# !pip install opendatasets --upgrade
-# import opendatasets
-# print("\nrequired version 0.1.22 or higher: ", opendatasets.__version__)
-# 
-# !pip install pyspellchecker 
-# import spellchecker
-# print("\nRequired version 0.7+", spellchecker.__version__)
-#
-# # STOP: Update your Kaggle access username or key first.
-# pluto.remember_kaggle_access_keys("your_kaggle_name", "your_kaggle_key")
-# pluto._write_kaggle_credit()
-# import kaggle
-#
-# @add_method(PacktDataAug)
-# def fetch_kaggle_comp_data(self,cname):
-#   #self._write_kaggle_credit()  # need to run only once.
-#   path = pathlib.Path(cname)
-#   kaggle.api.competition_download_cli(str(path))
-#   zipfile.ZipFile(f'{path}.zip').extractall(path)
-#   return
-# 
-# @add_method(PacktDataAug)
-# def fetch_kaggle_dataset(self,url,dest="kaggle"):
-#   #self._write_kaggle_credit()    # need to run only once.
-#   opendatasets.download(url,data_dir=dest)
-#   return
-# # -------------------- : --------------------
-
+pluto.version = 2.0
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
   self.kaggle_username = username
@@ -157,9 +124,12 @@ def fetch_kaggle_dataset(self,url,dest="kaggle"):
 import zipfile
 import os
 
+import zipfile
+import os
+
 @add_method(PacktDataAug)
 def fetch_df(self, csv):
-  df = pandas.read_csv(csv)
+  df = pandas.read_csv(csv, encoding='latin-1')
   return df
 
 @add_method(PacktDataAug)
