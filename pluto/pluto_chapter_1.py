@@ -21,7 +21,7 @@ class PacktDataAug(object):
     self.name = name
     if (is_verbose):
       self._ph()
-      self._pp("Hello from class", str(self.__class__) + " Class: " + str(self.__class__.__name__))
+      self._pp("Hello from class", f"{self.__class__} Class: {self.__class__.__name__}")
       self._pp("Code name", self.name)
       self._pp("Author is", self.author)
       self._ph()
@@ -39,20 +39,19 @@ class PacktDataAug(object):
     return
 # ---end of class
 #
-# Hack it! Add new method as needed.
-# add_method() is copy from Michael Garod's blog, 
-# https://medium.com/@mgarod/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
+# Hack it! Add new decorator
+# add_method() is inspired Michael Garod's blog, 
 # AND correction by: Филя Усков
 #
 import functools
-def add_method(cls):
-  def decorator(func):
-    @functools.wraps(func) 
-    def wrapper(*args, **kwargs): 
-      return func(*args, **kwargs)
-    setattr(cls, func.__name__, wrapper)
-    return func 
-  return decorator
+def add_method(x):
+  def dec(z):
+    @functools.wraps(z) 
+    def y(*args, **kwargs): 
+      return z(*args, **kwargs)
+    setattr(x, z.__name__, y)
+    return z 
+  return dec
 #
 
 pluto = PacktDataAug("Pluto")
@@ -64,11 +63,12 @@ def say_sys_info(self):
   self._pp("System time", now.strftime("%Y/%m/%d %H:%M"))
   self._pp("Platform", sys.platform)
   self._pp("Pluto Version (Chapter)", self.version)
-  self._pp("Python (3.7.10)", 'actual: ' + ''.join(str(sys.version).splitlines()))
-  self._pp("PyTorch (1.11.0)", 'actual: ' + str(torch.__version__))
-  self._pp("Pandas (1.3.5)", 'actual: ' + str(pandas.__version__))
-  self._pp("PIL (9.0.0)", 'actual: ' + str(PIL.__version__))
-  self._pp("Matplotlib (3.2.2)", 'actual: ' + str(matplotlib.__version__))
+  v = sys.version.replace('\n', '')
+  self._pp("Python (3.7.10)", f'actual: {v}')
+  self._pp("PyTorch (1.11.0)", f'actual: {torch.__version__}')
+  self._pp("Pandas (1.3.5)", f'actual: {pandas.__version__}')
+  self._pp("PIL (9.0.0)", f'actual: {PIL.__version__}')
+  self._pp("Matplotlib (3.2.2)", f'actual: {matplotlib.__version__}')
   #
   try:
     val = psutil.cpu_count()
@@ -76,8 +76,8 @@ def say_sys_info(self):
     val = psutil.cpu_freq()
     if (None != val):
       val = val._asdict()
-      self._pp("CPU speed", (str(round((val["current"] / 1000), 2)) + " GHz"))
-      self._pp("CPU max speed", (str(round((val["max"] / 1000), 2)) + " GHz"))
+      self._pp("CPU speed",  f'{val["current"]/1000:.2f} GHz')
+      self._pp("CPU max speed", f'{val["max"]/1000:.2f} GHz') 
     else:
       self._pp("*CPU speed", "NOT available")
   except:
