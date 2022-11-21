@@ -21,7 +21,7 @@ class PacktDataAug(object):
     self.name = name
     if (is_verbose):
       self._ph()
-      self._pp("Hello from class", str(self.__class__) + " Class: " + str(self.__class__.__name__))
+      self._pp("Hello from class", f"{self.__class__} Class: {self.__class__.__name__}")
       self._pp("Code name", self.name)
       self._pp("Author is", self.author)
       self._ph()
@@ -39,20 +39,19 @@ class PacktDataAug(object):
     return
 # ---end of class
 #
-# Hack it! Add new method as needed.
-# add_method() is copy from Michael Garod's blog, 
-# https://medium.com/@mgarod/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
+# Hack it! Add new decorator
+# add_method() is inspired Michael Garod's blog, 
 # AND correction by: Филя Усков
 #
 import functools
-def add_method(cls):
-  def decorator(func):
-    @functools.wraps(func) 
-    def wrapper(*args, **kwargs): 
-      return func(*args, **kwargs)
-    setattr(cls, func.__name__, wrapper)
-    return func 
-  return decorator
+def add_method(x):
+  def dec(z):
+    @functools.wraps(z) 
+    def y(*args, **kwargs): 
+      return z(*args, **kwargs)
+    setattr(x, z.__name__, y)
+    return z 
+  return dec
 #
 
 pluto = PacktDataAug("Pluto")
@@ -64,11 +63,12 @@ def say_sys_info(self):
   self._pp("System time", now.strftime("%Y/%m/%d %H:%M"))
   self._pp("Platform", sys.platform)
   self._pp("Pluto Version (Chapter)", self.version)
-  self._pp("Python (3.7.10)", 'actual: ' + ''.join(str(sys.version).splitlines()))
-  self._pp("PyTorch (1.11.0)", 'actual: ' + str(torch.__version__))
-  self._pp("Pandas (1.3.5)", 'actual: ' + str(pandas.__version__))
-  self._pp("PIL (9.0.0)", 'actual: ' + str(PIL.__version__))
-  self._pp("Matplotlib (3.2.2)", 'actual: ' + str(matplotlib.__version__))
+  v = sys.version.replace('\n', '')
+  self._pp("Python (3.7.10)", f'actual: {v}')
+  self._pp("PyTorch (1.11.0)", f'actual: {torch.__version__}')
+  self._pp("Pandas (1.3.5)", f'actual: {pandas.__version__}')
+  self._pp("PIL (9.0.0)", f'actual: {PIL.__version__}')
+  self._pp("Matplotlib (3.2.2)", f'actual: {matplotlib.__version__}')
   #
   try:
     val = psutil.cpu_count()
@@ -76,8 +76,8 @@ def say_sys_info(self):
     val = psutil.cpu_freq()
     if (None != val):
       val = val._asdict()
-      self._pp("CPU speed", (str(round((val["current"] / 1000), 2)) + " GHz"))
-      self._pp("CPU max speed", (str(round((val["max"] / 1000), 2)) + " GHz"))
+      self._pp("CPU speed",  f'{val["current"]/1000:.2f} GHz')
+      self._pp("CPU max speed", f'{val["max"]/1000:.2f} GHz') 
     else:
       self._pp("*CPU speed", "NOT available")
   except:
@@ -86,6 +86,8 @@ def say_sys_info(self):
   return
 
 pluto.version = 2.0
+import opendatasets
+#
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
   self.kaggle_username = username
@@ -124,30 +126,35 @@ def fetch_kaggle_dataset(self,url,dest="kaggle"):
 import zipfile
 import os
 
-import zipfile
-import os
-
 @add_method(PacktDataAug)
-def fetch_df(self, csv):
-  df = pandas.read_csv(csv, encoding='latin-1')
+def fetch_df(self, csv,sep=','):
+  df = pandas.read_csv(csv, encoding='latin-1', sep=sep)
   return df
+#
+@add_method(PacktDataAug)
+def _fetch_larger_font(self):
+  heading_properties = [('font-size', '20px')]
+  cell_properties = [('font-size', '18px')]
+  dfstyle = [dict(selector="th", props=heading_properties),
+    dict(selector="td", props=cell_properties)]
+  return dfstyle
 
 @add_method(PacktDataAug)
 def build_sf_fname(self, df):
   root = 'state-farm-distracted-driver-detection/imgs/train/'
-  df["fname"] = root + df.classname + '/' + df.img
+  df["fname"] = root + df.classname+'/'+df.img
   return
 
 # set internal counter for image to be zero, e.g. pluto0.jpg, pluto1.jpg, etc.
 pluto.fname_id = 0
-
+#
 @add_method(PacktDataAug)
 def _drop_image(self,canvas, fname=None,format=".jpg",dname="Data-Augmentation-with-Python/pluto_img"):
   if (fname is None):
     self.fname_id += 1
     if not os.path.exists(dname):
       os.makedirs(dname)
-    fn = dname + "/pluto" + str(self.fname_id) + format
+    fn = f'{dname}/pluto{self.fname_id}{format}'
   else:
     fn = fname
   canvas.savefig(fn, cmap="Greys", bbox_inches="tight", pad_inches=0.25)
@@ -201,10 +208,13 @@ def make_dir_dataframe(self, start_path):
   return self.build_shoe_fname(start_path)
 
 @add_method(PacktDataAug)
-def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
+def print_batch_text(self,df_orig, disp_max=6, cols=["title", "description"],is_larger_font=True): 
   df = df_orig[cols] 
   with pandas.option_context("display.max_colwidth", None):
-    display(df.sample(disp_max))
+    if (is_larger_font):
+      display(df.sample(disp_max).style.set_table_styles(self._fetch_larger_font()))
+    else:
+      display(df.sample(disp_max))
   return
 
 @add_method(PacktDataAug)
@@ -213,14 +223,17 @@ def count_word(self, df, col_dest="description"):
   return
 
 @add_method(PacktDataAug)
-def draw_word_count(self,df, wc='wordc'):
-  canvas, pic = matplotlib.pyplot.subplots(1,2, figsize=(16,5))
+def draw_word_count(self,df, wc='wordc',is_stack_verticle=True):
+  if (is_stack_verticle):
+    canvas, pic = matplotlib.pyplot.subplots(2,1, figsize=(8,10))
+  else:
+    canvas, pic = matplotlib.pyplot.subplots(1,2, figsize=(16,5))
   df.boxplot(ax=pic[0],column=[wc],vert=False,color="black")
   df[wc].hist(ax=pic[1], color="cornflowerblue", alpha=0.9)
   #
   title=["Description BoxPlot", "Description Histogram"]
   yaxis=["Description", "Stack"]
-  x1 = "Word Count: Mean: " + str(round(df[wc].mean(), 2)) + ", Min: " + str(df[wc].min()) + ", Max: " + str(df[wc].max())
+  x1 = f'Word Count: Mean: {df[wc].mean():0.2f}, Min: {df[wc].min()}, Max: {df[wc].max()}'
   xaxis=[x1, "Word Count"]
   #
   pic[0].set_title(title[0], fontweight ="bold")
@@ -237,6 +250,7 @@ def draw_word_count(self,df, wc='wordc'):
   return
 
 import re
+import spellchecker
 @add_method(PacktDataAug)
 def _strip_punc(self,s):
   p = re.sub(r'[^\w\s]','',s)
@@ -253,7 +267,7 @@ pluto.version = 5.0
 import missingno
 @add_method(PacktDataAug)
 def draw_text_null_data(self, df, color=(0.3,0.36,0.44)):
-  canvas, pic = matplotlib.pyplot.subplots(1, 1, figsize=(16, 6))
+  canvas, pic = matplotlib.pyplot.subplots(1, 1, figsize=(10, 6))
   missingno.matrix(df,color=color,ax=pic)
   pic.set_title('Missing Data (Null Value)')
   pic.set_xlabel('Solid is has data. White line is missing/null data.')
@@ -264,12 +278,11 @@ def draw_text_null_data(self, df, color=(0.3,0.36,0.44)):
 
 import nltk
 import wordcloud
-
 import re
 @add_method(PacktDataAug)
 def _draw_image_wordcloud(self, words_str, xignore_words='cat', title='Word Cloud:'):
   canvas, pic = matplotlib.pyplot.subplots(1, 1, figsize=(16, 8))
-  img = wordcloud.WordCloud(width = 1600, 
+  img = wordcloud.WordCloud(width = 1400, 
     height = 800, 
     background_color ='white',
     stopwords = xignore_words, 
@@ -291,10 +304,55 @@ def draw_text_wordcloud(self, df_1column, xignore_words='cat', title='Word Cloud
   self._draw_image_wordcloud(clean, xignore_words=xignore_words,title=title)
   return
 
+import profanity
+import re
+#
+@add_method(PacktDataAug)
+def _clean_text(self,x):
+  return (re.sub('[^A-Za-z0-9 .,!?#@]+', '', str(x)))
+#
+@add_method(PacktDataAug)
+def _clean_bad_word(self,x):
+  return (profanity.censor_profanity(x, ''))
+#
+@add_method(PacktDataAug)
+def clean_text(self, df):
+  df['clean_tweet'] = df.tweet.apply(self._clean_text)
+  df['clean_tweet'] = df['clean_tweet'].apply(self._clean_bad_word)
+  return df
+
 @add_method(PacktDataAug)
 def _drop_df_file(self, df,fname,type='csv',sep='~'):
   df.to_csv(fname,sep=sep)
   return 
+
+import nlpaug
+import nlpaug.augmenter
+import nlpaug.augmenter.char
+import nlpaug.augmenter.word
+
+pluto.orig_text = 'It was the best of times. It was the worst of times. It was the age of wisdom. It was the age of foolishness. It was the epoch of belief. It was the epoch of incredulity.'
+
+@add_method(PacktDataAug)
+def _print_aug_batch(self, df, aug_func, col_dest="description",
+  bsize=3, aug_name='Augmented',is_larger_font=True):
+  col_name = [aug_name, 'Original']
+  aug = aug_func.augment(self.orig_text, n=1)
+  data = [[aug[0], self.orig_text]]
+  df_aug = pandas.DataFrame(data, columns=col_name)
+  orig = df[col_dest].sample(bsize)
+  for tx in orig:
+    aug = aug_func.augment(tx, n=1)
+    data = [[aug[0], tx]]
+    t = pandas.DataFrame(data, columns=col_name)
+    df_aug = df_aug.append(t, ignore_index=True)
+  #
+  with pandas.option_context("display.max_colwidth", None):
+    if (is_larger_font):
+      display(df_aug.head(bsize+1).style.set_table_styles(self._fetch_larger_font()))
+    else:
+      display(df_aug.head(bsize+1))
+  return
 
 @add_method(PacktDataAug)
 def print_aug_ocr(self, df, col_dest="description",bsize=3, aug_name='Augmented'):
@@ -331,6 +389,10 @@ def print_aug_word_random(self, df, action='swap', col_dest="description",bsize=
   aug_func = nlpaug.augmenter.word.RandomWordAug(action=action)
   self._print_aug_batch(df, aug_func,col_dest=col_dest,bsize=bsize, aug_name=aug_name)
   return
+
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('punkt')
 
 @add_method(PacktDataAug)
 def print_aug_word_synonym(self, df, col_dest="description",bsize=3, aug_name='Augment'):
