@@ -94,6 +94,35 @@ def remember_kaggle_access_keys(self,username,key):
   self.kaggle_key = key
   return
 
+@add_method(PacktDataAug)
+def _write_kaggle_credit(self):
+  creds = '{"username":"'+self.kaggle_username+'","key":"'+self.kaggle_key+'"}'
+  kdirs = ["~/.kaggle/kaggle.json", "./kaggle.json"]
+  #
+  for k in kdirs:
+    cred_path = pathlib.Path(k).expanduser()
+    cred_path.parent.mkdir(exist_ok=True)
+    cred_path.write_text(creds)
+    cred_path.chmod(0o600)
+  import kaggle
+  #
+  return
+#
+@add_method(PacktDataAug)
+def fetch_kaggle_comp_data(self,cname):
+  #self._write_kaggle_credit()  # need to run only once.
+  path = pathlib.Path(cname)
+  kaggle.api.competition_download_cli(str(path))
+  zipfile.ZipFile(f'{path}.zip').extractall(path)
+  return
+#
+#
+@add_method(PacktDataAug)
+def fetch_kaggle_dataset(self,url,dest="kaggle"):
+  #self._write_kaggle_credit()    # need to run only once.
+  opendatasets.download(url,data_dir=dest)
+  return
+
 import zipfile
 import os
 
