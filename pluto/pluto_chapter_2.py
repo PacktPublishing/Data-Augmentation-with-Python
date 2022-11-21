@@ -86,61 +86,39 @@ def say_sys_info(self):
   return
 
 pluto.version = 2.0
+import opendatasets
+#
 @add_method(PacktDataAug)
 def remember_kaggle_access_keys(self,username,key):
   self.kaggle_username = username
   self.kaggle_key = key
   return
 
-@add_method(PacktDataAug)
-def _write_kaggle_credit(self):
-  creds = '{"username":"'+self.kaggle_username+'","key":"'+self.kaggle_key+'"}'
-  kdirs = ["~/.kaggle/kaggle.json", "./kaggle.json"]
-  #
-  for k in kdirs:
-    cred_path = pathlib.Path(k).expanduser()
-    cred_path.parent.mkdir(exist_ok=True)
-    cred_path.write_text(creds)
-    cred_path.chmod(0o600)
-  import kaggle
-  #
-  return
-#
-@add_method(PacktDataAug)
-def fetch_kaggle_comp_data(self,cname):
-  #self._write_kaggle_credit()  # need to run only once.
-  path = pathlib.Path(cname)
-  kaggle.api.competition_download_cli(str(path))
-  zipfile.ZipFile(f'{path}.zip').extractall(path)
-  return
-#
-#
-@add_method(PacktDataAug)
-def fetch_kaggle_dataset(self,url,dest="kaggle"):
-  #self._write_kaggle_credit()    # need to run only once.
-  opendatasets.download(url,data_dir=dest)
-  return
-
-import zipfile
-import os
-
 import zipfile
 import os
 
 @add_method(PacktDataAug)
-def fetch_df(self, csv):
-  df = pandas.read_csv(csv, encoding='latin-1')
+def fetch_df(self, csv,sep=','):
+  df = pandas.read_csv(csv, encoding='latin-1', sep=sep)
   return df
+#
+@add_method(PacktDataAug)
+def _fetch_larger_font(self):
+  heading_properties = [('font-size', '20px')]
+  cell_properties = [('font-size', '18px')]
+  dfstyle = [dict(selector="th", props=heading_properties),
+    dict(selector="td", props=cell_properties)]
+  return dfstyle
 
 @add_method(PacktDataAug)
 def build_sf_fname(self, df):
   root = 'state-farm-distracted-driver-detection/imgs/train/'
-  df["fname"] = root + df.classname + '/' + df.img
+  df["fname"] = root + df.classname+'/'+df.img
   return
 
 # set internal counter for image to be zero, e.g. pluto0.jpg, pluto1.jpg, etc.
 pluto.fname_id = 0
-
+#
 @add_method(PacktDataAug)
 def _drop_image(self,canvas, fname=None,format=".jpg",dname="Data-Augmentation-with-Python/pluto_img"):
   if (fname is None):
@@ -201,10 +179,13 @@ def make_dir_dataframe(self, start_path):
   return self.build_shoe_fname(start_path)
 
 @add_method(PacktDataAug)
-def print_batch_text(self,df_orig, disp_max=10, cols=["title", "description"]): 
+def print_batch_text(self,df_orig, disp_max=6, cols=["title", "description"],is_larger_font=True): 
   df = df_orig[cols] 
   with pandas.option_context("display.max_colwidth", None):
-    display(df.sample(disp_max))
+    if (is_larger_font):
+      display(df.sample(disp_max).style.set_table_styles(self._fetch_larger_font()))
+    else:
+      display(df.sample(disp_max))
   return
 
 @add_method(PacktDataAug)
@@ -213,8 +194,11 @@ def count_word(self, df, col_dest="description"):
   return
 
 @add_method(PacktDataAug)
-def draw_word_count(self,df, wc='wordc'):
-  canvas, pic = matplotlib.pyplot.subplots(1,2, figsize=(16,5))
+def draw_word_count(self,df, wc='wordc',is_stack_verticle=True):
+  if (is_stack_verticle):
+    canvas, pic = matplotlib.pyplot.subplots(2,1, figsize=(8,10))
+  else:
+    canvas, pic = matplotlib.pyplot.subplots(1,2, figsize=(16,5))
   df.boxplot(ax=pic[0],column=[wc],vert=False,color="black")
   df[wc].hist(ax=pic[1], color="cornflowerblue", alpha=0.9)
   #
@@ -237,6 +221,7 @@ def draw_word_count(self,df, wc='wordc'):
   return
 
 import re
+import spellchecker
 @add_method(PacktDataAug)
 def _strip_punc(self,s):
   p = re.sub(r'[^\w\s]','',s)
