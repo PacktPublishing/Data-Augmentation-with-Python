@@ -150,7 +150,7 @@ def _drop_image(self,canvas, fname=None,format=".jpg",dname="Data-Augmentation-w
     fn = dname + "/pluto" + str(self.fname_id) + format
   else:
     fn = fname
-  canvas.savefig(fn, cmap="Greys", bbox_inches="tight", pad_inches=0.25)
+  canvas.savefig(fn, bbox_inches="tight", pad_inches=0.25)
   return
 #
 @add_method(PacktDataAug)
