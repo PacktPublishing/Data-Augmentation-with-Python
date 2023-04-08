@@ -1,4 +1,4 @@
-# Data-Augmentation-with-Python
+# Data Augmentation with Python
 Unlock the power of data augmentation for AI and Generative AI with real-world datasets. Improve your model’s accuracy and extend images, texts, audio, and tabular using 150+ fully functional OO methods and open-source libraries.
 
 ## Book available on Amazon book
