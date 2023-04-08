@@ -3,6 +3,8 @@ Unlock the power of data augmentation for AI and Generative AI with real-world d
 
 ## Book available on Amazon book
 - https://www.amazon.com/dp/1803246456
+- Author: Duc Haba
+- Published: 2023
 
 ## Key Features
 - Practical Data augmentation techniques for images, texts, audio, and tabular data using real-world datasets
