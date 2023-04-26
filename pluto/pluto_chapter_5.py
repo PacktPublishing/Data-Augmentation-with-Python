@@ -345,7 +345,8 @@ def _print_aug_batch(self, df, aug_func, col_dest="description",
     aug = aug_func.augment(tx, n=1)
     data = [[aug[0], tx]]
     t = pandas.DataFrame(data, columns=col_name)
-    df_aug = df_aug.append(t, ignore_index=True)
+    #df_aug = df_aug.append(t, ignore_index=True)
+    df_aug = pandas.concat([df_aug, t], ignore_index=True)
   #
   with pandas.option_context("display.max_colwidth", None):
     if (is_larger_font):
