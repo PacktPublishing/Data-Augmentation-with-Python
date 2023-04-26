@@ -196,7 +196,8 @@ def build_shoe_fname(self, start_path):
       f = os.path.join(root, name)
       p = pathlib.Path(f).parent.name 
       d = pandas.DataFrame({'fname': [f], 'label': [p]})
-      df = df.append(d, ignore_index=True)
+      #df = df.append(d, ignore_index=True)
+      df = pandas.concat([df, d], ignore_index=True)
   #
   # clean it up
   df = df.reset_index(drop=True)
