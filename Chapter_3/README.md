@@ -1,3 +1,4 @@
+
 # Content
 
 1. The file ending in "*_chapter_3.ipynb" is the clean file. 
