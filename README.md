@@ -52,10 +52,8 @@ code until the concept or technique is firmly understood.
 | Python                                 | Chrome, Edge, Safari, or FireFox browser on  |                                       
 |                                        |     Windows, macOS, or Linux.                |                                                     
 | Jupyter Notebook (Python Notebook)     |                                              |
-| Python standard libraries, Panda,      |
-  Matplotlib, and Numpy                  |                                              |
-| Python image, text, audio, and tabular
-  data augmentation libraries.           |                                              |
+| Python standard libraries, Panda,  Matplotlib, and Numpy                              |                                              
+| Python image, text, audio, and tabular data augmentation libraries.                   |                                             
 
 The default online Jupyter Notebook is the Google Colab. You need a Google account. For other
 online Jupyter Notebook, like Kaggle, Microsoft, or other online Jupyter Notebook, you need sign up
