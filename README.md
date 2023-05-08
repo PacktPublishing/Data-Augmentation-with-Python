@@ -83,7 +83,7 @@ Notebook as much as I enjoyed writing it.
 
 
 
-## 📖 Book available on Amazon book
+## 📖 Book available on Amazon 
 - https://www.amazon.com/dp/1803246456
 - Author: Duc Haba
 - Published: 2023
