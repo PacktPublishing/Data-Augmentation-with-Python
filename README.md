@@ -43,7 +43,7 @@ With the following software and hardware list you can run all code files present
 
 ### Software and Hardware List
 
-I designed this book to be a hands-on journey. It will be more effective to read a chapter, run the code
+This book to be a hands-on journey. It will be more effective to read a chapter, run the code
 on the Python Notebook, re-read the chapter’s part that confused you, and jump back to hacking the
 code until the concept or technique is firmly understood.
 
