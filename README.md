@@ -30,15 +30,13 @@ All of the code is organized into folders.
 
 The code will look like the following:
 ```
-.pluto.remember_kaggle_access_keys("your_username_here",
-"your_key_here")
+.pluto.remember_kaggle_access_keys("your_username_here", "your_key_here")
 ```
 
 
 **Following is what you need for this book:**
 This book is for data scientists and students interested in the AI discipline. Advanced AI or deep learning skills are not required; however, knowledge of Python programming and familiarity with Jupyter Notebooks are essential to understanding the topics covered in this book.		 
 
-Basic knowledge of Python will help you get more from the examples.	
 With the following software and hardware list you can run all code files present in the book (Chapter 1-9).
 
 ### Software and Hardware List
