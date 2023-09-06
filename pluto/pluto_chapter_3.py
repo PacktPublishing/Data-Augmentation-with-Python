@@ -517,7 +517,7 @@ def draw_word_count(self,df, wc='wordc',is_stack_verticle=True):
 
 # prompt: write the python inline documentation for the following function: _strip_punc
 import re
-import spellchecker
+#import spellchecker
 @add_method(PacktDataAug)
 def _strip_punc(self,s):
   """
@@ -1529,7 +1529,7 @@ def draw_image_teaser_crop(self,df,label='Center Crop'):
 @add_method(PacktDataAug)
 def draw_image_teaser_resize(self,df,label='Resize with squishing mode'):
 
-    """
+  """
   This function is used to draw the image teaser for the book.
 
   Args:
